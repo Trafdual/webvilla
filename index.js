@@ -6,11 +6,15 @@ const methodOverride = require('method-override')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const MongoStore = require('connect-mongo')
+const sanphamrouter = require('./router/SanPhamRouter')
+const chitietsanphamrouter = require('./router/ChiTietSanPhamRouter')
+const danhgiarouter = require('./router/DanhGiaRouter')
+const blogrouter = require('./router/BlogRouter')
+const userrouter = require('./router/UserRouter')
 const passport = require('passport')
 var path = require('path')
 
 const port = process.env.PORT || 8080
-
 
 var app = express()
 app.use(methodOverride('_method'))
@@ -55,6 +59,12 @@ app.use(passport.session())
 
 app.use(cors())
 
+app.use('/', blogrouter)
+app.use('/', userrouter)
+app.use('/', sanphamrouter)
+app.use('/', chitietsanphamrouter)
+app.use('/', danhgiarouter)
+
 app.listen(port, () => {
   try {
     console.log('kết nối thành công 8080')
@@ -62,4 +72,3 @@ app.listen(port, () => {
     console.log('kết nối thất bại 8080', error)
   }
 })
-
