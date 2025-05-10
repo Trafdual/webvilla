@@ -84,10 +84,10 @@ router.get('/getdgfall', async (req, res) => {
   }
 })
 
-router.post('/postdanhgia/:idsanpham', async (req, res) => {
+router.post('/postdanhgia/:namekhongdau', async (req, res) => {
   try {
-    const idsanpham = req.params.idsanpham
-    const sanpham = await SanPham.findById(idsanpham)
+    const namekhongdau = req.params.namekhongdau
+    const sanpham = await SanPham.findOne({ namekhongdau })
     if (!sanpham) {
       return res.status(400).json({ message: 'Sản phẩm không tồn tại' })
     }

@@ -28,7 +28,6 @@ router.get('/chitietsanpham/:namekhongdau', async (req, res) => {
         .json({ message: 'Chi tiết sản phẩm không tồn tại' })
     }
 
-    
     const danhgiajson = await Promise.all(
       sanpham.danhgia.map(async dg => {
         const danhgia = await DanhGia.findOne({ _id: dg._id, isRead: true })
@@ -46,10 +45,24 @@ router.get('/chitietsanpham/:namekhongdau', async (req, res) => {
 
     const danhgiaFiltered = danhgiajson.filter(dg => dg !== null)
 
+    const cacphongconlai = await SanPham.find({
+      _id: { $ne: sanpham._id }
+    }).lean()
+
+    const cacphongconlaijson = cacphongconlai.map(sp => {
+      return {
+        _id: sp._id,
+        namesanpham: sp.namesanpham,
+        namekhongdau: sp.namekhongdau,
+        img: sp.img_sanpham
+      }
+    })
+
     const datajson = {
-      sanpham:sanpham.namesanpham,
+      sanpham: sanpham.namesanpham,
       chitietsanpham,
-      danhgia: danhgiaFiltered
+      danhgia: danhgiaFiltered,
+      remainingroom: cacphongconlaijson
     }
     res.json(datajson)
   } catch (error) {
