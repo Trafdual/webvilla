@@ -193,6 +193,35 @@ router.post(
   }
 )
 
+router.get('/getttsanpham/:idsanpham', async (req, res) => {
+  try {
+    const { idsanpham } = req.params
+
+    const sanpham = await SanPham.findById(idsanpham)
+    if (!sanpham) {
+      return res.status(404).json({ message: 'Không tìm thấy sản phẩm' })
+    }
+    const chitietsanpham = await ChiTietSanPham.findById(sanpham.chitiet._id)
+
+    const data = {
+      _id: sanpham._id,
+      namesanpham: sanpham.namesanpham,
+      namekhongdau: sanpham.namekhongdau,
+      img_sanpham: sanpham.img_sanpham,
+      chitiet: {
+        _id: chitietsanpham._id,
+        img: chitietsanpham.img,
+        content: chitietsanpham.content
+      }
+    }
+
+    res.json(data)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Lỗi máy chủ' })
+  }
+})
+
 router.post('/postxoaanh/:idchitiet', async (req, res) => {
   try {
     const idchitiet = req.params.idchitiet

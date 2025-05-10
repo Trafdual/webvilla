@@ -44,21 +44,12 @@ router.get('/sanphamadmin', async (req, res) => {
   }
 })
 
-router.post('/deletesanpham', async (req, res) => {
+router.post('/deletesanpham/:id', async (req, res) => {
   try {
-    const { ids } = req.body
-
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ message: 'Danh sách ID không hợp lệ' })
-    }
-
-    for (const id of ids) {
-      const sanpham = await SanPham.findById(id)
-      if (sanpham.chitiet) {
-        await chietietsp.deleteOne({ _id: sanpham.chitiet._id })
-      }
-    }
-    await SanPham.deleteMany({ _id: { $in: ids } })
+    const id = req.params.id
+    const sanpham = await SanPham.findById(id)
+    await chietietsp.findByIdAndDelete(sanpham.chitiet._id)
+    await SanPham.findByIdAndDelete(id)
 
     res.json({ message: 'Xóa thành công' })
   } catch (error) {

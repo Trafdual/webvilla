@@ -3,6 +3,7 @@ const router = express.Router()
 const uploads = require('./upload')
 const Blog = require('../models/BlogModel')
 const momenttimezone = require('moment-timezone')
+const moment = require('moment')
 const unicode = require('unidecode')
 function removeSpecialChars (str) {
   const specialChars = /[:+,!@#$%^&*()\-/?.\s]/g
@@ -102,8 +103,7 @@ router.get('/getblog', async (req, res) => {
         tieude_blog: bl.tieude_blog,
         tieude_khongdau: bl.tieude_khongdau,
         img_blog: bl.img_blog,
-        ngaydang: bl.ngaydang,
-        noidung: bl.noidung
+        ngaydang: moment(bl.ngaydang).format('DD/MM/YYYY'),
       }
     })
     res.json(blogjson)
@@ -112,6 +112,9 @@ router.get('/getblog', async (req, res) => {
     console.log(error)
   }
 })
+
+
+
 
 router.get('/getchitietblog/:tieude_khongdau', async (req, res) => {
   try {
