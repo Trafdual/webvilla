@@ -82,6 +82,17 @@ router.post(
   }
 )
 
+router.post('/deleteblog', async (req, res) => {
+  try {
+    const { ids } = req.body
+    await Blog.deleteMany({ _id: { $in: ids } })
+    res.json({ message: 'Xóa thành công' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
 router.get('/getblog', async (req, res) => {
   try {
     const blog = await Blog.find().lean()

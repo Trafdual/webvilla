@@ -3,6 +3,86 @@ const router = express.Router()
 const DanhGia = require('../models/DanhGiaModel')
 const SanPham = require('../models/SanPhamModel')
 const momenttimezone = require('moment-timezone')
+const moment = require('moment')
+
+router.get('/getdanhgiaadmin/:idsanpham', async (req, res) => {
+  try {
+    const idsanpham = req.params.idsanpham
+    const sanpham = await SanPham.findById(idsanpham)
+    if (!sanpham) {
+      return res.json({ error: 'Sản phẩm không tồn tại' })
+    }
+    const danhgiajson = await Promise.all(
+      sanpham.danhgia.map(async dg => {
+        const danhgia = await DanhGia.findById(dg._id)
+        return {
+          _id: danhgia._id,
+          name: danhgia.name,
+          rating: danhgia.rating,
+          content: danhgia.content,
+          date: moment(danhgia.date).format('HH:mm:ss DD/MM/YYYY'),
+          trangthai: danhgia.isRead
+        }
+      })
+    )
+    res.json(danhgiajson)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
+router.get('/getdanhgia/:idsanpham', async (req, res) => {
+  try {
+    const idsanpham = req.params.idsanpham
+    const sanpham = await SanPham.findById(idsanpham)
+    if (!sanpham) {
+      return res.json({ error: 'Sản phẩm không tồn tại' })
+    }
+    const danhgiajson = await Promise.all(
+      sanpham.danhgia.map(async dg => {
+        const danhgia = await DanhGia.findById(dg._id)
+        if (!danhgia) return null
+        return {
+          _id: danhgia._id,
+          name: danhgia.name,
+          rating: danhgia.rating,
+          content: danhgia.content,
+          date: moment(danhgia.date).format('DD/MM/YYYY'),
+          trangthai: danhgia.isRead
+        }
+      })
+    )
+    const danhgiaFiltered = danhgiajson.filter(dg => dg !== null)
+    res.json(danhgiaFiltered)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
+router.get('/getdgfall', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const [danhgia, total] = await Promise.all([
+      DanhGia.find({ isRead: false }).skip(skip).limit(limit).lean(),
+      DanhGia.countDocuments({ isRead: false })
+    ])
+
+    res.json({
+      data: danhgia,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
 
 router.post('/postdanhgia/:idsanpham', async (req, res) => {
   try {

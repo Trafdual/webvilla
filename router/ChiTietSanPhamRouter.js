@@ -116,21 +116,22 @@ router.post(
     try {
       const { idsanpham } = req.params
       const { namesanpham, content } = req.body
+      const updatedSanphamFields = {}
 
-      const name = unicode(namesanpham)
-      const namekhongdau = removeSpecialChars(name)
+      if (namesanpham) {
+        const name = unicode(namesanpham)
+        const namekhongdau = removeSpecialChars(name)
 
-      const existed = await SanPham.findOne({
-        namekhongdau,
-        _id: { $ne: idsanpham }
-      })
-      if (existed) {
-        return res.status(400).json({ message: 'Sản phẩm đã tồn tại' })
-      }
+        const existed = await SanPham.findOne({
+          namekhongdau,
+          _id: { $ne: idsanpham }
+        })
+        if (existed) {
+          return res.status(400).json({ message: 'Sản phẩm đã tồn tại' })
+        }
 
-      const updatedSanphamFields = {
-        namesanpham,
-        namekhongdau
+        updatedSanphamFields.namesanpham = namesanpham
+        updatedSanphamFields.namekhongdau = namekhongdau
       }
 
       const image = req.files['image']?.[0]?.filename
@@ -140,7 +141,7 @@ router.post(
 
       const updatedSanpham = await SanPham.findByIdAndUpdate(
         idsanpham,
-        updatedSanphamFields,
+        { $set: updatedSanphamFields },
         { new: true }
       )
 

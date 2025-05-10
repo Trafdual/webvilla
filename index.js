@@ -11,6 +11,7 @@ const chitietsanphamrouter = require('./router/ChiTietSanPhamRouter')
 const danhgiarouter = require('./router/DanhGiaRouter')
 const blogrouter = require('./router/BlogRouter')
 const userrouter = require('./router/UserRouter')
+const dondatrouter = require('./router/DonDatRouter')
 const passport = require('passport')
 var path = require('path')
 
@@ -64,6 +65,7 @@ app.use('/', userrouter)
 app.use('/', sanphamrouter)
 app.use('/', chitietsanphamrouter)
 app.use('/', danhgiarouter)
+app.use('/', dondatrouter)
 
 app.listen(port, () => {
   try {
