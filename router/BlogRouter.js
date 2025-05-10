@@ -83,10 +83,10 @@ router.post(
   }
 )
 
-router.post('/deleteblog', async (req, res) => {
+router.post('/deleteblog/:id', async (req, res) => {
   try {
-    const { ids } = req.body
-    await Blog.deleteMany({ _id: { $in: ids } })
+    const id = req.params.id
+    await Blog.findByIdAndDelete(id)
     res.json({ message: 'Xóa thành công' })
   } catch (error) {
     console.error(error)
@@ -103,7 +103,7 @@ router.get('/getblog', async (req, res) => {
         tieude_blog: bl.tieude_blog,
         tieude_khongdau: bl.tieude_khongdau,
         img_blog: bl.img_blog,
-        ngaydang: moment(bl.ngaydang).format('DD/MM/YYYY'),
+        ngaydang: moment(bl.ngaydang).format('DD/MM/YYYY')
       }
     })
     res.json(blogjson)
@@ -113,8 +113,23 @@ router.get('/getblog', async (req, res) => {
   }
 })
 
+router.get('/getchitietblogadmin/:id', async (req, res) => {
+  try {
+    const id = req.params.id
+    const blog = await Blog.findById(id)
 
-
+    const blogjson = {
+      _id: blog._id,
+      tieude_blog: blog.tieude_blog,
+      img_blog: blog.img_blog,
+      noidung: blog.noidung
+    }
+    res.json(blogjson)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+    console.log(error)
+  }
+})
 
 router.get('/getchitietblog/:tieude_khongdau', async (req, res) => {
   try {

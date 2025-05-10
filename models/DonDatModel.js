@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const dondatSchema = new mongoose.Schema({
   ngaynhanphong: { type: Date },
   ngaytraphong: { type: Date },
+  ngaydat: { type: Date },
   thucdon: { type: String },
   phone: { type: String },
   trangthai: { type: Number, default: 0 }

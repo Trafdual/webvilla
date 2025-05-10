@@ -5,26 +5,21 @@ const SanPham = require('../models/SanPhamModel')
 const momenttimezone = require('moment-timezone')
 const moment = require('moment')
 
-router.get('/getdanhgiaadmin/:idsanpham', async (req, res) => {
+router.get('/getdanhgiaadmin', async (req, res) => {
   try {
-    const idsanpham = req.params.idsanpham
-    const sanpham = await SanPham.findById(idsanpham)
-    if (!sanpham) {
-      return res.json({ error: 'Sản phẩm không tồn tại' })
-    }
-    const danhgiajson = await Promise.all(
-      sanpham.danhgia.map(async dg => {
-        const danhgia = await DanhGia.findById(dg._id)
-        return {
-          _id: danhgia._id,
-          name: danhgia.name,
-          rating: danhgia.rating,
-          content: danhgia.content,
-          date: moment(danhgia.date).format('HH:mm:ss DD/MM/YYYY'),
-          trangthai: danhgia.isRead
-        }
-      })
-    )
+    const danhgia = await DanhGia.find().lean()
+    const danhgiajson = danhgia.map(dg => {
+      return {
+        _id: dg._id,
+        name: dg.name,
+        email: dg.email,
+        rating: dg.rating,
+        content: dg.content,
+        date: moment(dg.date).format('HH:mm:ss DD/MM/YYYY'),
+        trangthai: dg.isRead
+      }
+    })
+
     res.json(danhgiajson)
   } catch (error) {
     console.error(error)
@@ -113,6 +108,34 @@ router.post('/postdanhgia/:namekhongdau', async (req, res) => {
       date: danhgia.date
     }
     res.json(danhgiajson)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
+router.post('/postdanhgiaadmin', async (req, res) => {
+  try {
+    const { name, email, content, rating, namesanpham } = req.body
+    const sanpham = await SanPham.findOne({ namesanpham })
+    if (!sanpham) {
+      return res.status(400).json({ message: 'Sản phẩm không tồn tại' })
+    }
+
+    const vietnamTime = momenttimezone().toDate()
+    const danhgia = new DanhGia({
+      name,
+      email,
+      content,
+      rating,
+      date: vietnamTime,
+      sanpham: sanpham._id,
+      isRead: true
+    })
+    await danhgia.save()
+    sanpham.danhgia.push(danhgia._id)
+    await sanpham.save()
+    res.json(danhgia)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })

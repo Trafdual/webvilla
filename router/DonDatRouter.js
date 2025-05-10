@@ -2,13 +2,17 @@ const express = require('express')
 const router = express.Router()
 const DonDat = require('../models/DonDatModel')
 const moment = require('moment')
+const momenttimezone = require('moment-timezone')
+
 
 router.post('/postdatphong', async (req, res) => {
   try {
     const { ngaynhanphong, ngaytraphong, thucdon, phone } = req.body
+    const vietnamTime = momenttimezone().toDate()
     const dondat = new DonDat({
       ngaynhanphong,
       ngaytraphong,
+      ngaydat: vietnamTime,
       thucdon,
       phone
     })
@@ -28,6 +32,7 @@ router.get('/getdatphong', async (req, res) => {
         _id: dd._id,
         ngaynhanphong: moment(dd.ngaynhanphong).format('DD/MM/YYYY'),
         ngaytraphong: moment(dd.ngaytraphong).format('DD/MM/YYYY'),
+        ngaydat: moment(dd.ngaydat).format('DD/MM/YYYY'),
         thucdon: dd.thucdon,
         phone: dd.phone
       }
