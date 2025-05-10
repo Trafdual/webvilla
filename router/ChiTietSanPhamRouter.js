@@ -27,6 +27,8 @@ router.get('/chitietsanpham/:namekhongdau', async (req, res) => {
         .status(400)
         .json({ message: 'Chi tiết sản phẩm không tồn tại' })
     }
+
+    
     const danhgiajson = await Promise.all(
       sanpham.danhgia.map(async dg => {
         const danhgia = await DanhGia.findOne({ _id: dg._id, isRead: true })
@@ -45,6 +47,7 @@ router.get('/chitietsanpham/:namekhongdau', async (req, res) => {
     const danhgiaFiltered = danhgiajson.filter(dg => dg !== null)
 
     const datajson = {
+      sanpham:sanpham.namesanpham,
       chitietsanpham,
       danhgia: danhgiaFiltered
     }

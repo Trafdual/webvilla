@@ -16,7 +16,7 @@ router.post('/postdatphong', async (req, res) => {
     res.json(dondat)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+    res.status(500).json({ error: `Đã xảy ra lỗi: ${error}` })
   }
 })
 
